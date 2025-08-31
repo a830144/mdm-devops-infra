@@ -1,11 +1,33 @@
 groups:
-  - name: example-alerts
-    rules:
-      - alert: HighRequestRate
-        expr: rate(http_server_requests_seconds_count[1m]) > 5
-        for: 1m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High request rate detected"
-          description: "Service {{ $labels.job }} has >5 requests/sec"
+- name: example-alerts
+  rules:
+
+  # 1. High request rate alert
+  - alert: HighRequestRate
+    expr: rate(http_server_requests_seconds_count[1m]) > 5
+    for: 5s
+    labels:
+      severity: critical
+    annotations:
+      summary: "High request rate detected for customer-mdm-service"
+      description: "More than 5 requests/sec for 5s"
+
+  # 2. High response time alert
+  - alert: HighAvgResponseTime
+    expr: (rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])) > 0.5
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "High average response time"
+      description: "Average response time > 0.5s for 30s"
+
+  # 3. Low traffic alert (optional)
+  - alert: LowRequestRate
+    expr: rate(http_server_requests_seconds_count[1m]) < 0.1
+    for: 1m
+    labels:
+      severity: info
+    annotations:
+      summary: "Very low request rate"
+      description: "Less than 0.1 requests/sec for 1 minute"
